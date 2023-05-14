@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "rss-reader"
+version = "0.1.0"
+description = "RSS Reader web application"
+authors = ["Guilherme Pereira <guilherme.mp.eng@gmail.com>"]
+readme = "README.md"
+packages = [{include = "rss_reader"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.95.1"
+uvicorn = {extras = ["standard"], version = "^0.22.0"}
+sqlalchemy = "^2.0.13"
+psycopg2-binary = "^2.9.6"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
