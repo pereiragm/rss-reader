@@ -17,6 +17,8 @@ alembic = "^1.10.4"
 pytest = "^7.3.1"
 httpx = "^0.24.0"
 email-validator = "^2.0.0.post2"
+beautifulsoup4 = "^4.12.2"
+lxml = "^4.9.2"
 
 
 [tool.poetry.group.dev.dependencies]
