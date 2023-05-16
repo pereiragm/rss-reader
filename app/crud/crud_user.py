@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 
-from rss_reader.core.security import get_password_hash
-from rss_reader.models import User
-from rss_reader.schemas.user import UserCreate
+from app.core.security import get_password_hash
+from app.models import User
+from app.schemas.user import UserCreate
 
 
 def create_user(db: Session, obj_in: UserCreate) -> User:

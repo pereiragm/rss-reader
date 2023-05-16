@@ -5,11 +5,11 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from rss_reader.core.config import settings
-from rss_reader.db.session import SessionLocal
-from rss_reader.db.base_class import Base
-from rss_reader.main import app
-from rss_reader.main import get_db
+from app.core.config import settings
+from app.db.session import SessionLocal
+from app.db.base_class import Base
+from app.main import app
+from app.main import get_db
 
 
 @pytest.fixture(scope="session")
@@ -56,6 +56,3 @@ def client(db) -> Generator:
 # def client() -> Generator:
 #     with TestClient(app) as c:
 #         yield c
-
-
-

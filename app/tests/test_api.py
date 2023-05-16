@@ -9,10 +9,7 @@ def test_root_endpoint(client: TestClient) -> None:
 
 
 def test_create_user(client: TestClient, db: Session) -> None:
-    data = {
-        "email": "user@example.com",
-        "password": "string"
-    }
+    data = {"email": "user@example.com", "password": "string"}
 
     r = client.post("/users", json=data)
 

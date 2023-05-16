@@ -1,9 +1,9 @@
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
 
-from rss_reader.crud import crud_user
-from rss_reader.db.session import SessionLocal
-from rss_reader.schemas import user
+from app.crud import crud_user
+from app.db.session import SessionLocal
+from app.schemas import user
 
 app = FastAPI()
 
