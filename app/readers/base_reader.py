@@ -13,7 +13,8 @@ from app.schemas.post import PostBase
 
 logger = logging.getLogger(__name__)
 
-RSS_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %z"  # e.g., "Tue, 16 May 2023 22:41:12 +0200"
+# e.g., "Tue, 16 May 2023 22:41:12 +0200"
+RSS_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %z"
 
 
 class RSSFeedReader:
@@ -47,12 +48,9 @@ class RSSFeedReader:
         return response
 
     def _build_model(self) -> FeedBase:
-
         def get_datetime_utc(dt_input: str) -> dt.datetime:
-            return dt.datetime.strptime(
-                dt_input,
-                RSS_DATETIME_FORMAT
-            ).astimezone(dt.timezone.utc)
+            dt_from_str = dt.datetime.strptime(dt_input, RSS_DATETIME_FORMAT)
+            return dt_from_str.astimezone(tz=dt.timezone.utc)
 
         posts = [
             PostBase(
@@ -61,7 +59,9 @@ class RSSFeedReader:
                 link=item.link.next_sibling.text,
                 pub_date=get_datetime_utc(item.pubdate.text),
             )
-            for item in self.soup.rss.channel.find_all("item")  # Get list with <item> tags
+            for item in self.soup.rss.channel.find_all(
+                "item"
+            )  # Get list with <item> tags
         ]
 
         feed = FeedBase(
