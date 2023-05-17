@@ -6,28 +6,14 @@ import datetime as dt
 
 from bs4 import BeautifulSoup
 import requests
-from pydantic import BaseModel
 from requests import HTTPError, Response
+
+from app.schemas.feed import FeedBase
+from app.schemas.post import PostBase
 
 logger = logging.getLogger(__name__)
 
 RSS_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %z"  # e.g., "Tue, 16 May 2023 22:41:12 +0200"
-
-
-class Post(BaseModel):
-    title: str
-    description: str
-    link: str
-    pub_date: dt.datetime
-
-
-class Feed(BaseModel):
-    title: str
-    description: str
-    link: str
-    language: str | None = None
-    last_build_date: dt.datetime
-    posts: list[Post] = []
 
 
 class RSSFeedReader:
@@ -60,7 +46,7 @@ class RSSFeedReader:
 
         return response
 
-    def _build_model(self) -> Feed:
+    def _build_model(self) -> FeedBase:
 
         def get_datetime_utc(dt_input: str) -> dt.datetime:
             return dt.datetime.strptime(
@@ -69,7 +55,7 @@ class RSSFeedReader:
             ).astimezone(dt.timezone.utc)
 
         posts = [
-            Post(
+            PostBase(
                 title=item.title.text,
                 description=item.description.text,
                 link=item.link.next_sibling.text,
@@ -78,7 +64,7 @@ class RSSFeedReader:
             for item in self.soup.rss.channel.find_all("item")  # Get list with <item> tags
         ]
 
-        feed = Feed(
+        feed = FeedBase(
             title=self.soup.rss.channel.title.text,
             description=self.soup.rss.channel.description.text,
             link=self.soup.rss.channel.link.next_sibling.text,
@@ -90,7 +76,7 @@ class RSSFeedReader:
         return feed
 
     @property
-    def model(self) -> Feed:
+    def model(self) -> FeedBase:
         return self._model
 
 
