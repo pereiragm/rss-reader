@@ -14,7 +14,8 @@ from app.schemas.post import PostBase
 logger = logging.getLogger(__name__)
 
 # e.g., "Tue, 16 May 2023 22:41:12 +0200"
-RSS_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %z"
+# RSS_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %z"
+RSS_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %Z"
 
 
 class RSSFeedReader:
