@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
@@ -13,4 +14,5 @@ class Post(Base):
     title = Column(String(255), unique=True, nullable=False, index=True)
     description = Column(String(1000), nullable=False)
     link = Column(String(255), unique=True, nullable=False)
-    pub_date = Column(DateTime(), nullable=False, index=True)
+    pub_date = Column(DateTime(timezone=True), nullable=False, index=True)
+    feed = relationship("Feed", back_populates="posts")
