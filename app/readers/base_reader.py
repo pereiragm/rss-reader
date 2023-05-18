@@ -24,27 +24,16 @@ class RSSFeedReader:
     """
 
     def __init__(self, rss_url: str, parser: str = "lxml") -> None:
+        self.base_log = f"[{self.__class__.__name__}] -"
         self.url = rss_url
         self.parser = parser
         self.response = self._make_request()
         self.soup = BeautifulSoup(self.response.text, self.parser)
         self._model = self._build_model()
 
-        self.base_log = f"[{self.__class__.__name__}] -"
-
     def _make_request(self) -> Response | None:
-        try:
-            response = requests.get(self.url)
-        except Exception as e:
-            logger.error(f"{self.base_log} Error requesting to {self.url}. {e}")
-            return
-
-        try:
-            response.raise_for_status()
-        except HTTPError as e:
-            logger.error(f"{self.base_log} Unexpected response from {self.url}. {e}")
-            return
-
+        response = requests.get(self.url)
+        response.raise_for_status()
         return response
 
     def _build_model(self) -> FeedBase:
@@ -78,15 +67,3 @@ class RSSFeedReader:
     @property
     def model(self) -> FeedBase:
         return self._model
-
-
-if __name__ == "__main__":
-    feeds = [
-        "https://www.jcchouinard.com/author/jean-christophe-chouinard/feed/",
-        # "https://www.nu.nl/rss/Algemeen",
-    ]
-
-    for feed_url in feeds:
-        print("\nRSS Reader - Please check the latest news:\n")
-        feed_reader = RSSFeedReader(rss_url=feed_url)
-        print("The End")
