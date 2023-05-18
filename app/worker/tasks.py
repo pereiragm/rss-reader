@@ -45,7 +45,9 @@ def refresh_feed(self, feed_uuid: str, default_countdowns: tuple[int] = (1, 5)) 
         if self.request.retries == len(default_countdowns):
             logger.info(f"{base_log} Reached max_retries. Aborting...")
         else:
-            raise self.retry(exc=exc, countdown=default_countdowns[self.request.retries])
+            raise self.retry(
+                exc=exc, countdown=default_countdowns[self.request.retries]
+            )
     finally:
         db.close()
 
