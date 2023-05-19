@@ -17,7 +17,7 @@ user_feed = Table(
 class User(Base):
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     uuid = Column(UUID(as_uuid=True), unique=True, index=True, default=uuid.uuid4)
-    name = Column(String(255), nullable=True, index=True)
+    name = Column(String(255), nullable=False, index=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
     feeds = relationship("Feed", secondary=user_feed, backref="followers", lazy="dynamic")
     # hashed_password = Column(String, nullable=False)

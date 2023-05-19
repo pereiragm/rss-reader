@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, UUID4
 from sqlalchemy.orm import Session
 
 from app.crud.crud_user import get_user
+from app.crud.user_feed import subscribe_user_to_feeds
 from app.deps import get_db
 from app.models import Feed
 
@@ -51,27 +52,34 @@ class FeedsFollowResponseModel(BaseModel):
     feeds: list[FeedSimple]
 
 
-@router.post("/users/{user_uuid}/feeds-follow")
+@router.post("/users/{user_uuid}/feeds-follow", response_model=FeedsFollowResponseModel)
 async def subscribe_to_feeds(
         user_uuid: Annotated[UUID, Path(title="Must be a valid UUID")],
         req_model: FeedsFollowRequestModel,
         db: Session = Depends(get_db),
 ):
+    """
+    - Get all feeds from the requested uuids
+    - Check if all requested uuids exist on the DB
+        - False -> return 400
+    - Select feeds that the user does not follow
+    - Add subscription for them
+    """
+
     user = get_user(db, user_uuid)
-    req_feeds = req_model.feeds
+    req_feeds_uuids = req_model.feeds
 
     # Check if all requested feeds uuids exist
-    feeds = set(db.query(Feed.uuid).filter(Feed.uuid.in_(req_feeds)).all())
-    feeds_not_found = req_feeds - feeds
+    req_feeds = db.query(Feed).filter(Feed.uuid.in_(req_feeds_uuids)).all()
+    feeds_not_found = req_feeds_uuids - set([f.uuid for f in req_feeds])
     if feeds_not_found:
         raise Exception("Feeds not found on the DB.")
 
-    # query feeds followed by the user
-    import pdb; pdb.set_trace()
-    following = {f.uuid for f in user.feeds.filter(Feed.uuid.in_(req_feeds)).all()}
+    # Select feeds to follow
+    following_feeds = user.feeds.filter(Feed.uuid.in_(req_feeds_uuids)).all()
+    feeds_to_follow_uuids = req_feeds_uuids - {f.uuid for f in following_feeds}
+    feeds_to_follow = [f for f in req_feeds if f.uuid in feeds_to_follow_uuids]
 
-    feeds_to_follow = req_feeds - req_feeds.intersection(following)
+    subscribe_user_to_feeds(db, user=user, feeds=feeds_to_follow)
 
-    user.subscribe_to_feeds(db, feeds_to_follow)
-
-    return {"feeds": req_model}
+    return {"feeds": user.feeds.all()}

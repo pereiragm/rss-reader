@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models import Feed
-from app.schemas.feed import FeedBase
+from app.schemas.feed import FeedBase, FeedCreate
 
 
 def get_feed(db: Session, uuid: str) -> Feed | None:
@@ -16,6 +16,14 @@ def create_feed(db: Session, obj_in: FeedBase) -> Feed:
         language=obj_in.language,
         last_build_date=obj_in.last_build_date,
     )
+    db.add(feed_obj)
+    db.commit()
+    db.refresh(feed_obj)
+    return feed_obj
+
+
+def create_feed_v2(db: Session, obj_in: FeedCreate) -> Feed:
+    feed_obj = Feed(**obj_in.dict())
     db.add(feed_obj)
     db.commit()
     db.refresh(feed_obj)
