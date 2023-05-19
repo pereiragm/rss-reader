@@ -13,6 +13,13 @@ user_feed = Table(
     Column("feed_id", ForeignKey("feed.id"), primary_key=True),
 )
 
+user_post = Table(
+    "user_post",
+    Base.metadata,
+    Column("user_id", ForeignKey("user.id"), primary_key=True),
+    Column("post_id", ForeignKey("post.id"), primary_key=True),
+)
+
 
 class User(Base):
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
@@ -22,6 +29,6 @@ class User(Base):
     feeds = relationship(
         "Feed", secondary=user_feed, backref="followers", lazy="dynamic"
     )
-    # hashed_password = Column(String, nullable=False)
-    # is_active = Column(Boolean(), default=True)
-    # is_superuser = Column(Boolean(), default=False)
+    read_posts = relationship(
+        "Post", secondary=user_post, backref="readers", lazy="dynamic"
+    )
