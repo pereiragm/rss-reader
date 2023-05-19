@@ -9,7 +9,7 @@ from app.core.config import settings
 from app.db.session import SessionLocal
 from app.db.base_class import Base
 from app.main import app
-from app.main import get_db
+from app.deps import get_db
 
 
 @pytest.fixture(scope="session")

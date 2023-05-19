@@ -1,24 +1,14 @@
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
 
+from app.api.v1 import api_router
 from app.crud import crud_user
-from app.db.session import SessionLocal
+from app.deps import get_db
 from app.schemas import user
 
 app = FastAPI()
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+app.include_router(api_router, prefix="/api/v1")
 
 
 @app.post("/users/", response_model=user.User)
