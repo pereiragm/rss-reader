@@ -19,7 +19,9 @@ class User(Base):
     uuid = Column(UUID(as_uuid=True), unique=True, index=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False, index=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
-    feeds = relationship("Feed", secondary=user_feed, backref="followers", lazy="dynamic")
+    feeds = relationship(
+        "Feed", secondary=user_feed, backref="followers", lazy="dynamic"
+    )
     # hashed_password = Column(String, nullable=False)
     # is_active = Column(Boolean(), default=True)
     # is_superuser = Column(Boolean(), default=False)

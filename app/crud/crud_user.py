@@ -10,9 +10,6 @@ def get_user(db: Session, uuid: UUID) -> User | None:
     return db.query(User).filter_by(uuid=uuid).one_or_none()
 
 
-
-
-
 def create_user(db: Session, obj_in: UserCreate) -> User:
     db_obj = User(
         email=obj_in.email,
