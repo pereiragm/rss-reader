@@ -6,6 +6,10 @@ from app.readers.exceptions import FeedNotFound
 from app.readers.helpers import refresh_feed
 
 
+class RefreshFeedNotFound(Exception):
+    pass
+
+
 class RefreshFeedResource(BaseResourceApiV1):
     def __init__(self, feed_uuid: UUID, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -16,6 +20,6 @@ class RefreshFeedResource(BaseResourceApiV1):
             raise UserNotFound("User UUID not found.")
 
         try:
-            refresh_feed(self.feed_uuid)
+            refresh_feed(self.db, str(self.feed_uuid))
         except FeedNotFound as e:
-            raise e
+            raise RefreshFeedNotFound(e.args[0])

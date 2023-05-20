@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.api.v1.exceptions import FeedNotFound, PostNotFound, UserNotFound
 from app.api.v1.resources.read_unread import ReadUnreadPostsResource
-from app.api.v1.resources.refresh_feed import RefreshFeedResource
+from app.api.v1.resources.refresh_feed import RefreshFeedNotFound, RefreshFeedResource
 from app.api.v1.resources.subscription import SubscriptionResource
 from app.deps import get_db
 
@@ -151,8 +151,7 @@ async def unread_posts(
     return {"posts": posts}
 
 
-@router.get("/users/{user_uuid}/feeds/{feed_uuid}/refresh",
-            status_code=status.HTTP_202_ACCEPTED)
+@router.get("/users/{user_uuid}/feeds/{feed_uuid}/refresh")
 async def refresh_feed(
         user_uuid: Annotated[UUID, Path(title="Must be a valid UUID")],
         feed_uuid: Annotated[UUID, Path(title="Must be a valid UUID")],
@@ -164,7 +163,7 @@ async def refresh_feed(
     resource = RefreshFeedResource(db=db, user_uuid=user_uuid, feed_uuid=feed_uuid)
     try:
         resource.refresh()
-    except (UserNotFound, FeedNotFound) as e:
+    except (UserNotFound, RefreshFeedNotFound) as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.args[0])
 
-    return {"message": f"Feed {feed_uuid} will refreshed soon."}
+    return {"message": f"Feed {feed_uuid} has been refreshed successfully."}
