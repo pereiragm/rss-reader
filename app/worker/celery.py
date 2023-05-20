@@ -11,9 +11,9 @@ app = Celery(
 )
 
 app.conf.beat_schedule = {
-    'refresh-feeds-routine': {
-        'task': 'app.worker.tasks.refresh_feeds_routine',
-        'schedule': 300,  # every 5 minutes
+    "refresh-feeds-routine": {
+        "task": "app.worker.tasks.refresh_feeds_routine",
+        "schedule": 300,  # every 5 minutes
     },
 }
-app.conf.timezone = 'UTC'
+app.conf.timezone = "UTC"

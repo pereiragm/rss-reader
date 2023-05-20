@@ -36,13 +36,13 @@ def feed_science(db: Session) -> Feed:
             title="[Science] Post 1",
             description="This is Post 1 about science",
             link="http://sciencetoday.com/posts/1",
-            pub_date=datetime.utcnow(),
+            pub_date=datetime(2023, 1, 1, 6, 20),
         ),
         PostCreate(
             title="[Science] Post 2",
             description="This is Post 2 about science",
             link="http://sciencetoday.com/posts/2",
-            pub_date=datetime.utcnow(),
+            pub_date=datetime(2023, 5, 20, 10, 10),
         ),
     ]
     for ps in posts_schemas:
@@ -109,8 +109,26 @@ def url_unread_posts(*args, **kwargs) -> Callable:
 
 
 @pytest.fixture(scope="function")
+def url_list_posts(*args, **kwargs) -> Callable:
+    def f(*args, **kwargs):
+        url = f"/api/v1/users/{kwargs['user_uuid']}/posts"
+        if kwargs.get("read") and kwargs.get("feed_uuid"):
+            url += f"?{kwargs['read']}&{kwargs['feed_uuid']}"
+        else:
+            if kwargs.get("read") and not kwargs.get("feed_uuid"):
+                url += f"?{kwargs['read']}"
+            elif kwargs.get("feed_uuid") and not kwargs.get("read"):
+                url += f"?{kwargs['feed_uuid']}"
+        return url
+
+    return f
+
+
+@pytest.fixture(scope="function")
 def url_refresh_feed(*args, **kwargs) -> Callable:
     def f(*args, **kwargs):
-        return f"/api/v1/users/{kwargs['user_uuid']}/feeds/{kwargs['feed_uuid']}/refresh"
+        return (
+            f"/api/v1/users/{kwargs['user_uuid']}/feeds/{kwargs['feed_uuid']}/refresh"
+        )
 
     return f

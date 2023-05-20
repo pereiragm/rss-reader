@@ -18,7 +18,7 @@ def _create_feeds(db):
             "title": "Tweakers",
             "description": "Tweakers is de grootste hardwaresite en techcommunity van Nederland.",
             "link": "https://feeds.feedburner.com/tweakers/mixed",
-        }
+        },
     ]
 
     for data in feeds_info:
@@ -31,7 +31,7 @@ def _create_user(db):
         UserCreate(
             name="Admin User",
             email="admin@test.com",
-            uuid="220840cf-43fe-458f-8eb5-4e57fc5c8b23"
+            uuid="220840cf-43fe-458f-8eb5-4e57fc5c8b23",
         ),
     ]
     for user_schema in users_info:

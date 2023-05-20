@@ -26,9 +26,7 @@ def refresh_feed(db: Session, feed_uuid: str) -> None:
         posts_to_be_added = reader.model.posts
     else:
         posts_to_be_added = [
-            post
-            for post in reader.model.posts
-            if post.pub_date > most_recent_post_dt
+            post for post in reader.model.posts if post.pub_date > most_recent_post_dt
         ]
 
     for post in posts_to_be_added:

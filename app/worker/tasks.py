@@ -10,9 +10,7 @@ logger = get_task_logger(__name__)
 
 @celery_app.task(bind=True)
 def refresh_feed(
-        self,
-        feed_uuid: str,
-        default_countdowns: tuple[int] = (2 * 60, 5 * 60, 8 * 60)
+    self, feed_uuid: str, default_countdowns: tuple[int] = (2 * 60, 5 * 60, 8 * 60)
 ) -> None:
     """
     Task to refresh feed posts.
