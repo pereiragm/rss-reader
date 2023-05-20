@@ -123,3 +123,28 @@ async def read_posts(
         raise HTTPException(status_code=400, detail=e.args[0])
 
     return {"posts": posts}
+
+
+@router.post(
+    "/users/{user_uuid}/posts-unread", response_model=ReadUnreadPostsRespSchema
+)
+async def unread_posts(
+    user_uuid: Annotated[UUID, Path(title="Must be a valid UUID")],
+    req_model: ReadUnreadPostsRequestSchema,
+    db: Session = Depends(get_db),
+):
+    """
+    Mark posts as unread.
+    """
+    resource = ReadUnreadPostsResource(
+        db=db, user_uuid=user_uuid, posts_uuids=req_model.posts
+    )
+
+    try:
+        posts = resource.unread_posts()
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.args[0])
+    except PostNotFound as e:
+        raise HTTPException(status_code=400, detail=e.args[0])
+
+    return {"posts": posts}

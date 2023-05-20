@@ -98,3 +98,11 @@ def url_read_posts(*args, **kwargs) -> Callable:
         return f"/api/v1/users/{kwargs['user_uuid']}/posts-read"
 
     return f
+
+
+@pytest.fixture(scope="function")
+def url_unread_posts(*args, **kwargs) -> Callable:
+    def f(*args, **kwargs):
+        return f"/api/v1/users/{kwargs['user_uuid']}/posts-unread"
+
+    return f
