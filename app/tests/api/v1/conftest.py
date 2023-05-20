@@ -5,8 +5,8 @@ import pytest
 from sqlalchemy.orm import Session
 
 from app.crud.crud_user import create_user
-from app.crud.feed import create_feed_v2
-from app.crud.post import create_post_v2
+from app.crud.feed import create_feed
+from app.crud.post import create_post
 from app.models import Feed, User
 from app.schemas.feed import FeedCreate
 from app.schemas.post import PostCreate
@@ -29,7 +29,7 @@ def feed_science(db: Session) -> Feed:
         language="en",
         last_build_date=datetime.utcnow(),
     )
-    feed = create_feed_v2(db, feed_science_schema)
+    feed = create_feed(db, feed_science_schema)
 
     posts_schemas = [
         PostCreate(
@@ -46,7 +46,7 @@ def feed_science(db: Session) -> Feed:
         ),
     ]
     for ps in posts_schemas:
-        create_post_v2(db, ps, feed_id=feed.id)
+        create_post(db, ps, feed_id=feed.id)
 
     return feed
 
@@ -60,7 +60,7 @@ def feed_arts(db: Session) -> Feed:
         language="en",
         last_build_date=datetime.utcnow(),
     )
-    return create_feed_v2(db, feed_arts_schema)
+    return create_feed(db, feed_arts_schema)
 
 
 @pytest.fixture(scope="function")
@@ -72,7 +72,7 @@ def feed_math(db: Session) -> Feed:
         language="en",
         last_build_date=datetime.utcnow(),
     )
-    return create_feed_v2(db, feed_math_schema)
+    return create_feed(db, feed_math_schema)
 
 
 #
@@ -104,5 +104,13 @@ def url_read_posts(*args, **kwargs) -> Callable:
 def url_unread_posts(*args, **kwargs) -> Callable:
     def f(*args, **kwargs):
         return f"/api/v1/users/{kwargs['user_uuid']}/posts-unread"
+
+    return f
+
+
+@pytest.fixture(scope="function")
+def url_refresh_feed(*args, **kwargs) -> Callable:
+    def f(*args, **kwargs):
+        return f"/api/v1/users/{kwargs['user_uuid']}/feeds/{kwargs['feed_uuid']}/refresh"
 
     return f

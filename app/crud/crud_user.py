@@ -11,12 +11,7 @@ def get_user(db: Session, uuid: UUID) -> User | None:
 
 
 def create_user(db: Session, obj_in: UserCreate) -> User:
-    db_obj = User(
-        email=obj_in.email,
-        # hashed_password=get_password_hash(obj_in.password),
-        name=obj_in.name,
-        # is_superuser=obj_in.is_superuser,
-    )
+    db_obj = User(**obj_in.dict())
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)

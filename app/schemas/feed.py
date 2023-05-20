@@ -26,5 +26,9 @@ class FeedBase2(BaseModel):
     refresh_enabled: bool = True
 
 
+class FeedRssReader(FeedBase2):
+    posts: list[PostBase] = []
+
+
 class FeedCreate(FeedBase2):
     pass
