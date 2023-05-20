@@ -48,8 +48,9 @@ class SubscriptionResource(BaseResourceApiV1):
             {f.uuid for f in following_feeds}
         )
         if feeds_to_unfollow_uuids:
-            feeds_to_unfollow = [f for f in req_feeds if
-                                 f.uuid in feeds_to_unfollow_uuids]
+            feeds_to_unfollow = [
+                f for f in req_feeds if f.uuid in feeds_to_unfollow_uuids
+            ]
             unsubscribe_from_feeds(self.db, user=self.user, feeds=feeds_to_unfollow)
 
         return self.user.feeds.all()

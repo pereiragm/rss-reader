@@ -4,3 +4,7 @@ class UserNotFound(Exception):
 
 class FeedNotFound(Exception):
     pass
+
+
+class PostNotFound(Exception):
+    pass
