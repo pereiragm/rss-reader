@@ -6,18 +6,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
-from app.db.session import SessionLocal
 from app.db.base_class import Base
+from app.deps import get_db
 from app.main import app
-from app.main import get_db
 
 
 @pytest.fixture(scope="session")
 def db_engine():
     engine = create_engine(settings.TEST_SQLALCHEMY_DATABASE_URL)
-    # if not database_exists:
-    #     create_database(engine.url)
-
     Base.metadata.create_all(bind=engine)
     yield engine
 
@@ -45,14 +41,3 @@ def client(db) -> Generator:
 
     with TestClient(app) as c:
         yield c
-
-
-# @pytest.fixture(scope="session")
-# def db() -> Generator:
-#     yield SessionLocal()
-#
-#
-# @pytest.fixture(scope="module")
-# def client() -> Generator:
-#     with TestClient(app) as c:
-#         yield c

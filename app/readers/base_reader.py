@@ -8,14 +8,35 @@ from bs4 import BeautifulSoup
 import requests
 from requests import HTTPError, Response
 
-from app.schemas.feed import FeedBase
+# from app.schemas.feed import FeedBase
+# from app.schemas.feed import FeedBase2 as FeedBase
+from app.schemas.feed import FeedRssReader as FeedBase
 from app.schemas.post import PostBase
 
 logger = logging.getLogger(__name__)
 
 # e.g., "Tue, 16 May 2023 22:41:12 +0200"
 # RSS_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %z"
-RSS_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %Z"
+RSS_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %Z"  # tweakers
+
+
+def dt_from_str(dt_input: str) -> dt.datetime:
+    _suported_formats = (
+        "%a, %d %b %Y %H:%M:%S %Z",
+        "%a, %d %b %Y %H:%M:%S %z",  # Tue, 16 May 2023 22:41:12 +0200
+    )
+
+    dt_out = None
+    for f in _suported_formats:
+        try:
+            dt_out = dt.datetime.strptime(dt_input, f)
+        except ValueError:
+            continue
+
+    if not dt_out:
+        Exception(f"Format not known: {dt_input}")
+
+    return dt_out
 
 
 class RSSFeedReader:
@@ -39,8 +60,8 @@ class RSSFeedReader:
 
     def _build_model(self) -> FeedBase:
         def get_datetime_utc(dt_input: str) -> dt.datetime:
-            dt_from_str = dt.datetime.strptime(dt_input, RSS_DATETIME_FORMAT)
-            return dt_from_str.astimezone(tz=dt.timezone.utc)
+            dt_out = dt_from_str(dt_input)
+            return dt_out.astimezone(tz=dt.timezone.utc)
 
         posts = [
             PostBase(

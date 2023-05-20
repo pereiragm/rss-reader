@@ -32,12 +32,8 @@ target_metadata = Base.metadata
 
 
 def get_db_url():
-    # user = os.getenv("POSTGRES_USER", "postgres")
-    # password = os.getenv("POSTGRES_PASSWORD", "")
-    # server = os.getenv("POSTGRES_SERVER", "db")
-    # db = os.getenv("POSTGRES_DB", "app")
-    # return f"postgresql://{user}:{password}@{server}/{db}"
-    return "postgresql+psycopg2://dbadmin:dbadmin@localhost:5435/rss_reader"
+    from app.core.config import settings
+    return settings.SQLALCHEMY_DATABASE_URL
 
 
 def run_migrations_offline() -> None:

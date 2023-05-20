@@ -1,0 +1,2 @@
+class FeedNotFound(Exception):
+    pass
