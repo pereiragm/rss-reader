@@ -1,9 +1,41 @@
 # rss-reader
 
-## Requirements
-Python 3.11+
+Web service which provides an API to interact with multiple RSS feeds and a background
+process to fetch the most recend feeds registered on our database.
+
+## System Design
+The classes have beens designed as shown in the diagram below:
+
+![Classes diagram](db_relationship_diagram.png)
+
+- A post points to a unique feed and a feed can have multiple posts.
+- A user can follow or unfollow a post. Hence, a register on the N-N table `UserFeed`
+represents a subscription of a user to a post, and a removal represents the unfollow
+action.
+- A user can mark a post as read. Hence, when it happens we add a register on the N-N
+table `UserPost`, and its removal represents the inverse (unread).
+
+Based on this design we have the system divided in two parts:
+
+**Background Process:**
+- Refresh the feeds, which means querying their URL, parsing its information and 
+inserting the posts related to the feed.
+- Implemented with [Celery](https://docs.celeryq.dev/en/stable/index.html) and [RabbitMQ](https://www.rabbitmq.com/)
+  to perform the assynchronous processing of feed refresh with back-off mechanism
+  for retries (in case of failures).
+
+**API**
+- Endpoints for the user to perform the actions of follow/unfollow a feed or
+  mark a post as read/unread.
+- Endpont to force a feed refresh
+- Endpoint to list posts using filters (read/unread, by feed)
+- Implemented with [FastAPI](https://fastapi.tiangolo.com/) framework
+- Offers an OpenAPI documentation for the API where you make requests to the available endpoints
+  using the browser and explore details of each endpoint (request/response schemas).
+  You can check how to access it on the section "Running the application".
 
 ## Installation
+Requirements: Python 3.11+
 
 Open a terminal and follow the instructions:
 
