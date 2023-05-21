@@ -93,7 +93,7 @@ docker run -d -p 5672:5672 --name rabbitmq-broker rabbitmq
 ```
 
 After all this set up you can run the different processes in different terminals:
-- Web application (access the swagger with the API on http://localhost:8000/docs)
+- Web application (access the OpenAPI documentation generated automatically on http://localhost:8000/docs)
     ```commandline
     uvicorn app.main:app --reload
     ```
