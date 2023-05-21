@@ -18,16 +18,22 @@ table `UserPost`, and its removal represents the inverse (unread).
 Based on this design we have the system divided in two parts:
 
 **Background Process:**
-- Refresh the feeds, which means querying their URL, parsing its information and 
-inserting the posts related to the feed.
 - Implemented with [Celery](https://docs.celeryq.dev/en/stable/index.html) and [RabbitMQ](https://www.rabbitmq.com/)
-  to perform the assynchronous processing of feed refresh with back-off mechanism
-  for retries (in case of failures).
+  to perform the asynchronous processing of feed refresh.
+- Routine (every 5 minutes) to trigger a refresh on all feeds which are "refreashable"
+  (default=True), which means querying their URL, parsing 
+  its information and inserting the posts related to the feed. Each feed refresh is 
+  performed by an isolated task, which can be processes in parallel by multiple
+  workers.
+- In case of failure on a feed refresh, the system provides 3 retries with a back-off
+  mechanism of 2, 5 and 8 minutes between retries. If the task reach the max retries
+  without success it will try to refresh on the next routine scheduled by the system (in 5 minutes).
+
 
 **API**
 - Endpoints for the user to perform the actions of follow/unfollow a feed or
   mark a post as read/unread.
-- Endpont to force a feed refresh
+- Endpoint to force a feed refresh (synchronously)
 - Endpoint to list posts using filters (read/unread, by feed)
 - Implemented with [FastAPI](https://fastapi.tiangolo.com/) framework
 - Offers an OpenAPI documentation for the API where you make requests to the available endpoints
