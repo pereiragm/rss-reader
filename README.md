@@ -59,12 +59,12 @@ poetry install
 
 ## Running the application
 
-Step 1 - Start a container with PostgreSQL:
+Step 1 - Start a container with PostgreSQL as our web application depends on it:
 ```commandline
 docker container run -d -p 5435:5432 --name pgsql -e POSTGRES_PASSWORD=postgres postgres:15.2
 ```
 
-Step 2 - Enter the `pgsql` container and the databases manually:
+Step 2 - Enter the `pgsql` container and create the databases manually:
 ```commandline
 docker exec -it pgsql bash
 su -l postgres -c psql
@@ -85,8 +85,9 @@ Step 4 - Add some initial data by running the script initialize_db.py:
 python initialize_db.py
 ```
 
-Step 4 - Start a container with the rabbitmq broker, sob the beat can add messages
-and the celery worker would be able to get them and process:
+Step 4 - Start a container with the rabbitmq broker, so the beat (routine scheduler)
+can add messages to the broker (message queue) and the celery worker will
+be able to get them and process:
 ```commandline
 docker run -d -p 5672:5672 --name rabbitmq-broker rabbitmq
 ```
