@@ -193,3 +193,9 @@ async def refresh_feed(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.args[0])
 
     return {"message": f"Feed {feed_uuid} has been refreshed successfully."}
+
+
+@router.get("/settings")
+async def get_settings():
+    from app.core.config import settings
+    return settings

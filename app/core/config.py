@@ -2,15 +2,21 @@ from pydantic.env_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    ENVIRONMENT: str = "development"
-    POSTGRESQL_USERNAME: str = "dbadmin"
-    POSTGRESQL_PASSWORD: str = "dbadmin"
-    POSTGRESQL_PORT: str = "5435"
-    SQLALCHEMY_DATABASE_URL: str = f"postgresql+psycopg2://{POSTGRESQL_PASSWORD}:{POSTGRESQL_USERNAME}@localhost:{POSTGRESQL_PORT}/rss_reader"  # noqa
-    TEST_SQLALCHEMY_DATABASE_URL: str = f"postgresql+psycopg2://{POSTGRESQL_PASSWORD}:{POSTGRESQL_USERNAME}@localhost:{POSTGRESQL_PORT}/rss_reader_test"
+    ENVIRONMENT: str
+
+    # Postgres
+    # POSTGRES_USER: str
+    # POSTGRES_PASSWORD: str
+    # POSTGRES_HOST: str
+    # POSTGRES_PORT: str
+    # SQLALCHEMY_DATABASE_URL: str = f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/rss_reader"  # noqa
+    SQLALCHEMY_DATABASE_URL: str
+    # TEST_SQLALCHEMY_DATABASE_URL: str = f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/rss_reader_test"
+    TEST_SQLALCHEMY_DATABASE_URL: str
 
     class Config:
         case_sensitive = True
+        # env_file = ".env"  # Configs are read from file
 
 
 settings = Settings()

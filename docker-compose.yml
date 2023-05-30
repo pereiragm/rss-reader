@@ -1,0 +1,56 @@
+version: "2.1"
+
+services:
+  env_printer:
+    build:
+      context: .
+      dockerfile: environ.dockerfile
+    env_file: .env
+  web:
+    build: .
+    env_file: .env
+    environment:
+      PROCESS_TYPE: "web"
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/code
+    networks:
+      - default
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: "postgres:15.2"
+    expose:
+      - "5432"  # Internal container port exposed (not accessible by the host machine)
+    ports:
+      - "5432:5432"
+    networks:
+      - default
+    environment:
+      POSTGRES_PASSWORD: "postgres"
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  worker:
+    build: .
+    env_file: .env
+    environment:
+      PROCESS_TYPE: "worker"
+    volumes:
+      - .:/code
+    networks:
+      - default
+    depends_on:
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
+  broker:
+    image: "rabbitmq"
+
+networks:
+  default:
