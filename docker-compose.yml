@@ -1,11 +1,6 @@
 version: "2.1"
 
 services:
-  env_printer:
-    build:
-      context: .
-      dockerfile: environ.dockerfile
-    env_file: .env
   web:
     build: .
     env_file: .env
@@ -48,7 +43,7 @@ services:
       db:
         condition: service_healthy
       broker:
-        condition: service_healthy
+        condition: service_started
   broker:
     image: "rabbitmq"
 
