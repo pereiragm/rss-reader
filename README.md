@@ -82,7 +82,7 @@ alembic -c alembic.ini upgrade head
 
 Step 4 - Add some initial data by running the script initialize_db.py:
 ```commandline
-python initialize_db.py
+python app/initialize_db.py
 ```
 
 Step 4 - Start a container with the rabbitmq broker, so the beat (routine scheduler)

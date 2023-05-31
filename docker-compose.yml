@@ -21,6 +21,8 @@ services:
       - "5432"  # Internal container port exposed (not accessible by the host machine)
     ports:
       - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
     networks:
       - default
     environment:
@@ -44,8 +46,25 @@ services:
         condition: service_healthy
       broker:
         condition: service_started
+  beat:
+    build: .
+    env_file: .env
+    environment:
+      PROCESS_TYPE: "beat"
+    volumes:
+      - .:/code
+    networks:
+      - default
+    depends_on:
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_started
   broker:
     image: "rabbitmq"
+
+volumes:
+  db-data:
 
 networks:
   default:
