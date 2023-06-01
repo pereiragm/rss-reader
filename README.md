@@ -69,8 +69,8 @@ Step 2 - Enter the `pgsql` container and create the databases manually:
 docker exec -it pgsql bash
 su -l postgres -c psql
 CREATE ROLE dbadmin WITH LOGIN PASSWORD 'dbadmin';
-CREATE DATABASE  rss_reader OWNER dbadmin;
-CREATE DATABASE  rss_reader_test OWNER dbadmin;
+CREATE DATABASE rss_reader OWNER dbadmin;
+CREATE DATABASE rss_reader_test OWNER dbadmin;
 ```
 The `rss_reader` is used by the application and the `rss_reader_test` is used
 only to run the tests.
