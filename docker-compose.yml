@@ -1,20 +1,6 @@
 version: "2.1"
 
 services:
-  web:
-    build: .
-    env_file: .env
-    environment:
-      PROCESS_TYPE: "web"
-    ports:
-      - "8000:80"
-    volumes:
-      - .:/code
-    networks:
-      - default
-    depends_on:
-      db:
-        condition: service_healthy
   db:
     image: "postgres:15.2"
     expose:
@@ -29,10 +15,26 @@ services:
     environment:
       POSTGRES_PASSWORD: "postgres"
     healthcheck:
-      test: ["CMD", "pg_isready"]
+      test: [ "CMD", "pg_isready", "-d", "$POSTGRES_DB", "-U", "$POSTGRES_USER"]
       interval: 10s
       timeout: 5s
       retries: 5
+  web:
+    build: .
+    env_file: .env
+    environment:
+      PROCESS_TYPE: "web"
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/code
+    networks:
+      - default
+    depends_on:
+      db:
+        condition: service_healthy
+  broker:
+    image: "rabbitmq"
   worker:
     build: .
     env_file: .env
@@ -61,8 +63,6 @@ services:
         condition: service_healthy
       broker:
         condition: service_started
-  broker:
-    image: "rabbitmq"
 
 volumes:
   db-data:
