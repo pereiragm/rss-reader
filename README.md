@@ -61,7 +61,7 @@ docker compose run web alembic -c alembic.ini upgrade head
 ```
 This will start a new container for the `web` service (will also start a container
 for the `db` service as it's a dependency) and run a one-off command to execute the 
-migration
+migration.
 
 **Step 2 (optional)** - Populate the database with initial data (user and some feeds):
 ```commandline
