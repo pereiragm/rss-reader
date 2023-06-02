@@ -59,14 +59,14 @@ and volumes start with **Step 1**, otherwise proceed to **Step 3**.
 ```commandline
 docker compose run web alembic -c alembic.ini upgrade head 
 ```
-
-**Step 2 (optional)** - Populate the database with initial data (user and some feeds).
-```commandline
-docker compose exec web python app/initialize_db.py
-```
 This will start a new container for the `web` service (will also start a container
-for the `db` service as it's a dependency) and run a one-off command to execute
-the python script. 
+for the `db` service as it's a dependency) and run a one-off command to execute the 
+migration
+
+**Step 2 (optional)** - Populate the database with initial data (user and some feeds):
+```commandline
+docker compose run web python app/initialize_db.py
+```
 
 **Step 3** - Create containers and start all services:
 ```commandline
