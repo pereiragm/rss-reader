@@ -68,8 +68,7 @@ This will start a new container for the `web` service (will also start a contain
 for the `db` service as it's a dependency) and run a one-off command to execute
 the python script. 
 
-**Step 3** - Create containers and start all services following the instructions
-on the Compose file:
+**Step 3** - Create containers and start all services:
 ```commandline
 docker compose up -d
 ```
