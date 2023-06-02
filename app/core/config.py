@@ -9,7 +9,7 @@ class Settings(BaseSettings):
 
     class Config:
         case_sensitive = True
-        # env_file = ".env"  # Configs are read from file
+        env_file = "local.env"
 
 
 settings = Settings()

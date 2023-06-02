@@ -15,6 +15,3 @@ __pycache__/
 
 # In case a virtual env "venv" is created
 venv/
-
-# dotenv files with configs for the project
-*.env
