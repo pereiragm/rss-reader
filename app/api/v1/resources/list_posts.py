@@ -28,15 +28,19 @@ class PostsResource(BaseResourceApiV1):
 
             else:
                 if self.read:
-                    # get posts read
-                    # ver ordenação dos posts por data de publicação ??????
-                    req_posts = self.user.read_posts.filter(self.user.id)
+                    req_posts = self.user.read_posts.order_by(
+                        Post.pub_date.desc()
+                    ).all()
 
                 else:
-                    # get posts unread
-                    all_posts = self.db.query(Post).order_by(desc(Post.pub_date)).all()
-                    read_posts = self.user.read_posts.filter(self.user.id)
-                    req_posts = [p for p in all_posts if not (p.uuid in read_posts)]
+                    # get unread posts
+                    read_posts = self.user.read_posts.subquery()
+                    req_posts = (
+                        self.db.query(Post)
+                        .filter(Post.id.notin_(self.db.query(read_posts.c.id)))
+                        .order_by(Post.pub_date.desc())
+                        .all()
+                    )
 
         else:
             # get posts of just one feed followed by user
