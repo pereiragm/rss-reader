@@ -66,7 +66,26 @@ def feed_arts(db: Session) -> Feed:
         language="en",
         last_build_date=datetime.utcnow(),
     )
-    return create_feed(db, feed_arts_schema)
+    feed = create_feed(db, feed_arts_schema)
+
+    posts_schemas = [
+        PostCreate(
+            title="[Arts] Post 1",
+            description="This is Post 1 about arts",
+            link="http://arts.com/posts/1",
+            pub_date=datetime(2023, 2, 1, 6, 20),
+        ),
+        PostCreate(
+            title="[Arts] Post 2",
+            description="This is Post 2 about arts",
+            link="http://arts.com/posts/2",
+            pub_date=datetime(2023, 3, 20, 10, 10),
+        ),
+    ]
+    for ps in posts_schemas:
+        create_post(db, ps, feed_id=feed.id)
+
+    return feed
 
 
 @pytest.fixture(scope="function")

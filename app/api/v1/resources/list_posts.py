@@ -1,7 +1,5 @@
 from uuid import UUID
 
-from sqlalchemy import desc
-
 from app.api.v1.exceptions import UserNotFound
 from app.api.v1.resources.base import BaseResourceApiV1
 from app.models import Feed
@@ -15,68 +13,51 @@ class PostsResource(BaseResourceApiV1):
         self.feed_uuid = feed_uuid
 
     def _get_filtered_posts(self) -> list[Post]:
-        req_posts = None
-
-        # evaluating filter to get posts
         if self.feed_uuid is None:
             # get posts of all feeds
+            base_q = self.db.query(Post)
 
             if self.read is None:
-                # get posts read and unread
-                # Must implement pagination
-                req_posts = self.db.query(Post).order_by(desc(Post.pub_date)).all()
-
+                # get all posts
+                req_posts_q = base_q
             else:
+                read_posts_q = self.user.read_posts.subquery()
+
                 if self.read:
-                    req_posts = self.user.read_posts.order_by(
-                        Post.pub_date.desc()
-                    ).all()
-
-                else:
-                    # get unread posts
-                    read_posts = self.user.read_posts.subquery()
-                    req_posts = (
-                        self.db.query(Post)
-                        .filter(Post.id.notin_(self.db.query(read_posts.c.id)))
-                        .order_by(Post.pub_date.desc())
-                        .all()
+                    # get read posts
+                    req_posts_q = base_q.filter(
+                        Post.id.in_(self.db.query(read_posts_q.c.id))
                     )
-
+                else:
+                    req_posts_q = base_q.filter(
+                        Post.id.notin_(self.db.query(read_posts_q.c.id))
+                    )
         else:
-            # get posts of just one feed followed by user
-
-            feed = self.db.query(Feed).filter(Feed.uuid == self.feed_uuid)
+            # get posts of just one feed
+            base_q = (
+                self.db.query(Post)
+                .join(Feed, Feed.id == Post.feed_id)
+                .filter(Feed.uuid == self.feed_uuid)
+            )
 
             if self.read is None:
-                # get posts read and unread of the feed
-                req_posts = (
-                    self.db.query(Post)
-                    .order_by(desc(Post.pub_date))
-                    .filter(Post.feed_id == feed.id)
-                    .all()
-                )
-
+                # get all posts of a specific feed
+                req_posts_q = base_q
             else:
+                read_posts_q = self.user.read_posts.subquery()
                 if self.read:
-                    # get posts read of the feed
-                    read_posts = self.user.read_posts.filter(self.user.id)
-                    req_posts = [p for p in read_posts if p.feed_id == feed.id]
-
-                else:
-                    # get posts unread of the feed
-                    all_posts_of_feed = (
-                        self.db.query(Post)
-                        .order_by(desc(Post.pub_date))
-                        .filter(Post.feed_id == feed.id)
-                        .all()
+                    # get read posts of the feed
+                    req_posts_q = base_q.filter(
+                        Post.id.in_(self.db.query(read_posts_q.c.id))
                     )
-                    read_posts = self.user.read_posts.filter(self.user.id)
-                    req_posts = [
-                        p for p in all_posts_of_feed if not (p.uuid in read_posts)
-                    ]
+                else:
+                    # get unread posts of the feed
+                    req_posts_q = base_q.filter(
+                        Post.id.notin_(self.db.query(read_posts_q.c.id))
+                    )
 
-        # returning list of posts
-        return req_posts
+        # TODO: implement pagination
+        return req_posts_q.order_by(Post.pub_date.desc()).all()
 
     def get_posts(self) -> list[Post]:
         if not self.user:
