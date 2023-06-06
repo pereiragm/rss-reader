@@ -1,10 +1,10 @@
 from celery import Celery
 
-broker_url = "amqp://localhost:5672"
+from app.core.config import settings
 
 app = Celery(
     main="rss-reader-worker",
-    broker=broker_url,
+    broker=settings.BROKER_URL,
     include=[
         "app.worker.tasks",
     ],

@@ -2,16 +2,15 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Path, status
-from pydantic import BaseModel, Field, UUID4
-from sqlalchemy.orm import Session
-
 from app.api.v1.exceptions import FeedNotFound, PostNotFound, UserNotFound
 from app.api.v1.resources.list_posts import PostsResource
 from app.api.v1.resources.read_unread import ReadUnreadPostsResource
 from app.api.v1.resources.refresh_feed import RefreshFeedNotFound, RefreshFeedResource
 from app.api.v1.resources.subscription import SubscriptionResource
 from app.deps import get_db
+from fastapi import APIRouter, Depends, HTTPException, Path, status
+from pydantic import BaseModel, Field, UUID4
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
