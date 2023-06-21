@@ -13,4 +13,5 @@ __pycache__/
 *.dat
 *.dir
 
+# In case a virtual env "venv" is created
 venv/

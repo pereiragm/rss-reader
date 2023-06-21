@@ -40,10 +40,66 @@ Based on this design we have the system divided in two parts:
   using the browser and explore details of each endpoint (request/response schemas).
   You can check how to access it on the section "Running the application".
 
-## Installation
-Requirements: Python 3.11+
+## Running the application
 
-Open a terminal and follow the instructions:
+### Docker (preferred)
+The installation with docker requires that you have both [docker](https://docs.docker.com/get-started/) 
+and [docker compose](https://docs.docker.com/compose/) installed on your host machine.
+It means that you don't need to install python, neither have the services like
+PostgreSQL and RabbitMQ running on your machine. This is because docker compose will
+take care of building/downloading the images related to each service and creating
+isolated containers (logical and physical isolation) running the processes for each
+service (check the [docker-compose.yml](docker-compose.yml) file).
+
+If it's **your first time** running the project or if you removed the containers
+and volumes start with **Step 1**, otherwise proceed to **Step 3**.
+
+**Step 1** - Open a terminal run the following command to create the databases
+(development and test) and execute migration to create the tables
+```commandline
+docker compose run web alembic -c alembic.ini upgrade head 
+```
+This will start a new container for the `web` service (will also start a container
+for the `db` service as it's a dependency) and run a one-off command to execute the 
+migration.
+
+**Step 2 (optional)** - Populate the database with initial data (user and some feeds):
+```commandline
+docker compose run web python app/initialize_db.py
+```
+
+**Step 3** - Create containers and start all services:
+```commandline
+docker compose up -d
+```
+You can check the running services with:
+```commandline
+docker compose ps
+```
+And open the logs for each service (check the names on the Compose file)
+in a separate terminal:
+```commandline
+docker compose logs -f <service_name> 
+```
+To stop all services and remove the containers:
+```commandline
+docker compose down
+```
+**Note:** use the option `--volumes` (e.g., `docker compose down --volumes`)
+to also remove named volumes declared in the volumes section of the Compose file and
+anonymous volumes attached to containers. In practice, it will destroy the databases
+created on **Step 1** and consequently the initial data populated on **Step 2**.
+
+
+### Locally (host machine)
+This process requires that you have Python 3.11+ installed on your host machine, so
+we can install the project dependencies in a [virtualenv](https://docs.python.org/3/library/venv.html)
+to execute the web, worker and beat processes. Also, as web application and celery 
+worker rely on both PostgreSQL 15.2 and RabbitMQ services running on your host machine,
+you need to install them or use docker to start a container for each one of them
+(the second option is what is described here).
+
+First, lets install the project. Open a terminal and follow the instructions:
 
 Create a virtual environment and activate it:
 ```commandline
@@ -51,45 +107,42 @@ python3 -m venv venv/
 source venv/bin/activate
 ```
 
-Install poetry (manage ours dependencies) and install the project:
+Install [poetry](https://python-poetry.org/docs/) (dependency manager)
 ```commandline
 pip install -U pip poetry==1.4.2
+```
+
+Install the project:
+```commandline
 poetry install
 ```
 
-## Running the application
+After installing the project, lets run the application by following the steps:
 
-Step 1 - Start a container with PostgreSQL as our web application depends on it:
+**Step 1** - Start the `db` service (will create a container with PostgreSQL and execute
+[initialization script](init_db.sh) to create user and databases)
 ```commandline
-docker container run -d -p 5435:5432 --name pgsql -e POSTGRES_PASSWORD=postgres postgres:15.2
-```
-
-Step 2 - Enter the `pgsql` container and create the databases manually:
-```commandline
-docker exec -it pgsql bash
-su -l postgres -c psql
-CREATE ROLE dbadmin WITH LOGIN PASSWORD 'dbadmin';
-CREATE DATABASE  rss_reader OWNER dbadmin;
-CREATE DATABASE  rss_reader_test OWNER dbadmin;
+docker compose up -d db
 ```
 The `rss_reader` is used by the application and the `rss_reader_test` is used
 only to run the tests.
 
-Step 3 - On another terminal, create the tables with alembic on database `rss_reader`:
+**Step 2** - On another terminal, run the migration to create the tables with alembic
+on database `rss_reader`:
 ```commandline
 alembic -c alembic.ini upgrade head
 ```
 
-Step 4 - Add some initial data by running the script initialize_db.py:
+**Step 3 (optional)** - Populate the database with initial data (user and some feeds):
 ```commandline
-python initialize_db.py
+python app/initialize_db.py
 ```
 
-Step 4 - Start a container with the rabbitmq broker, so the beat (routine scheduler)
-can add messages to the broker (message queue) and the celery worker will
-be able to get them and process:
+**Step 4** - Start `broker` service which will create a container with the RabbitMQ,
+so the beat (routine scheduler) can add messages to the broker (message queue) and
+the celery worker will be able to get them and process:
 ```commandline
-docker run -d -p 5672:5672 --name rabbitmq-broker rabbitmq
+docker compose up -d broker
 ```
 
 After all this set up you can run the different processes in different terminals:
@@ -107,7 +160,16 @@ After all this set up you can run the different processes in different terminals
     ```
 
 ## Running Tests
-On a terminal execute:
-```commandline
-pytest -v
-```
+
+- If you are running the project with docker and docker compose, open a terminal and
+execute:
+  ```commandline
+  docker compose run web pytest -v
+  ```
+
+- If your installed the project locally, you can simply execute:
+  ```commandline
+  pytest -v
+  ```
+  Note: make sure the `db` is running (`docker compose ps`) and if not, start it 
+  with `docker compose up -d db`.
