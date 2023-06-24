@@ -26,6 +26,7 @@ class User(Base):
     uuid = Column(UUID(as_uuid=True), unique=True, index=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False, index=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
+    password = Column(String(255), nullable=False, index=True)
     feeds = relationship(
         "Feed", secondary=user_feed, backref="followers", lazy="dynamic"
     )
